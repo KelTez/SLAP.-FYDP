@@ -1,3 +1,0 @@
-#README
-
-SLAP. Project Respository
