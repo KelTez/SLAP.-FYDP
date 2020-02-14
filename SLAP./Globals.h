@@ -11,7 +11,8 @@
 #define LED_PIN //probably wont use
 #define SPREAD_FACTOR DR_SF9
 #define CHANNEL 63 //using channel 63
-#define DOT_ID 3 //ID of the dot, see TTN for each individual dot.
+#define DOT_ID 1 //ID of the dot, see TTN for each individual dot. DOT 2 and 3 not working???
+//#define TEST_ESP32 //Only use when i wanna test the ESP, else comment
 
 /***********************************************************
  * Defining the board constants, set to 0 when not in use. *
@@ -26,6 +27,7 @@ const lmic_pinmap lmic_pins = {
     .rxtx_rx_active = 0,
     .rssi_cal = 8,              // LBT cal for the Adafruit Feather M0 LoRa, in dB
     .spi_freq = 8000000,
+    
 };
 
 /*******************

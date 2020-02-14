@@ -8,8 +8,10 @@
 
  * Note that ABP is used instead of OTAA, as our gateway does not support OTAA.
  *******************************************************************************/
-
 #include "Globals.h"
+#include "IR.h"
+//#include "IMU.h" //including this just crashes everything
+#include "Functions.h"
 #include <Arduino.h>
 
 // These callbacks are only used in over-the-air activation, so they are
@@ -20,7 +22,10 @@ void os_getArtEui (u1_t* buf) { }
 void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
 
-static uint8_t mydata[] = "Hello, world!";
+static uint8_t parkingState[2];
+static uint8_t IRState;
+static uint8_t IMUState;
+
 static osjob_t sendjob;
 
 // cycle limitations.
@@ -43,8 +48,8 @@ void onEvent (ev_t ev) {
             break;
     
         default:
-            Serial.print(F("Unknown event: "));
-            Serial.println((unsigned) ev);
+            //Serial.print(F("Unknown event: "));
+            //Serial.println((unsigned) ev);
             break;
     }
 }
@@ -55,8 +60,14 @@ void do_send(osjob_t* j){ //THIS IS WHERE I SHALL WRITE CODE TO CHECK THE STATUS
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
         // Prepare upstream data transmission at the next possible time.
-        LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0);
+        IRState = readIRValue(IR_SENSOR);
+        IMUState = readIMUValue(); //MAKE FUNCTION
+        parkingState[0] =lowByte(getParkState(IRState,IMUState,IR_SENSOR,0)); //MAKE FUNCTION
+        parkingState[1] = highByte(getParkState(IRState,IMUState,IR_SENSOR,0));
+        
+        LMIC_setTxData2(1, parkingState, sizeof(parkingState)-1, 0);
         Serial.println(F("Packet queued"));
+        Serial.println(parkingState[0]);
     }
     // Next TX is scheduled after TX_COMPLETE event.
 }
@@ -72,7 +83,6 @@ void setup() {
     os_init();
     // Reset the MAC state. Session and pending data transfers will be discarded.
     LMIC_reset();
-
 
     if(DOT_ID == 1){
         DEVADDR = 0x26021879;
