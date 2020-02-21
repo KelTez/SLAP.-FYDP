@@ -1,14 +1,13 @@
 #ifndef IMU_H
 #define IMU_H
-/*TO CHANGE LATER*/
-#include <Arduino.h>
 
-uint8_t readIMUValue();
-void setupIMU(void);
-void getIMUData(void);
-void getRawIMUData(void);
-void debugIMUData(void);
-void calibrateIMU(void);
-bool didDetectMagnet(void);
+#include <Arduino.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
+
+void initIMU();
+sensors_vec_t readIMUValue();
+uint8_t magnetState(); //get magnet state from reading IMU value
 
 #endif //IMU_H

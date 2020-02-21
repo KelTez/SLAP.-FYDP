@@ -1,108 +1,67 @@
 #include "IMU.h"
 #include "Functions.h"
-#include <Adafruit_Sensor.h>
-//#include <Adafruit_BNO055.h>
-//#include <utility/imumaths.h> //Doesn't exist?
-#define SENSOR_NUM_SAMPLES 5
+#include <Wire.h>
+
 //TO CHANGE
 
 #define MIN_GARBAGE_THRESH 1000
 #define MIN_MAGNET_THRESH 60
-/*
-Adafruit_BNO055 bno = Adafruit_BNO055();
-float calibXAngle = 0;
-float calibYAngle = 0;
-float calibZAngle = 0;
 
-void setupIMU() {
-  if(!bno.begin()) {
-    // There was a problem detecting the BNO055 ... check your connections 
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+Adafruit_BNO055 bno = Adafruit_BNO055(55);
+
+void initIMU(){
+
+  Serial.begin(9600);
+  Serial.println("Orientation Sensor Test"); Serial.println("");
+  
+  /* Initialise the sensor */
+  if(!bno.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     while(1);
   }
-}
 
-// void calibrateIMU() {
-//   delay(1000);
-//   float xAngle[10];
-//   float yAngle[10];
-//   float zAngle[10];
-//   for (int i = 0; i < SENSOR_NUM_SAMPLES; i++) {
-//     sensors_event_t event; 
-//     bno.getEvent(&event);
-//     xAngle[i] = event.orientation.x;
-//     yAngle[i] = event.orientation.y;
-//     zAngle[i] = event.orientation.z;
-//   }
-//   calibXAngle = filteredMean(xAngle);
-//   calibYAngle = filteredMean(yAngle);
-//   calibZAngle = filteredMean(zAngle);
-// }
-
-// NOTE - CLOCKWISE IS POSITIVE
-void getRawIMUData() {
-  int count = 0;
-  float xAngle[10];
-  float yAngle[10];
-  sensors_event_t event; 
-  for (int i = 0; i < SENSOR_NUM_SAMPLES; i++) {
+  Serial.println("IMU DETECTED!");
+  delay(1000);
     
-    bno.getEvent(&event);  
-    xAngle[i] = event.orientation.x;
-    yAngle[i] = event.orientation.y;
-  }
-
-
-  // if (cwHeading > 0.0) {
-  //   digitalWrite(LED_PIN, HIGH);
-  // } else {
-  //   digitalWrite(LED_PIN, LOW);
-  // }
-  
-  // ccwHeading = event.orientation.x;//(float)((int)(event.orientation.x + 360 - calibXAngle) % 360);
-  // // if 
-  // frontTilt = event.orientation.y;//(float)((int)(event.orientation.y + 360 - calibYAngle) % 360);
-  // ccwRollFromBack = 999;
+  bno.setExtCrystalUse(true);
 }
 
-void getIMUData() {
-  getRawIMUData();
-  // while ((cwHeading > 360 || cwHeading < 0) || abs(currHeading - cwHeading) > 90 && abs(currHeading - cwHeading) < 350) {
-  //   Serial.print("IMU data is bad... ");
-  //   Serial.println(cwHeading);
-  //   cwHeading = currHeading;  
-  //   getRawIMUData();
-  // }
-
-}
-
-bool didDetectMagnet() {
-  float mags[10];
-  int i = 0;
-  while (i < 10) {
-    imu::Vector<3> mag_vector = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    mags[i] = sqrt(mag_vector.x()*mag_vector.x()+mag_vector.y()*mag_vector.y()+mag_vector.z()*mag_vector.z());
-    // if (mags[i]*mags[i] < MIN_GARBAGE_THRESH) {
-    //   i -= 1;
-    // }
-    i += 1; 
-  }
-  float averagedMag = filteredMean(mags);
-  Serial.print("averagedMag: ");
-  Serial.println(averagedMag);
-  if (averagedMag > MIN_MAGNET_THRESH) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-// Debugging Functions...
-void debugIMUData() {
-  getIMUData();
-  int count = 0;
+sensors_vec_t readIMUValue(){
+  /* Get a new sensor event */ 
   sensors_event_t event; 
   bno.getEvent(&event);
-  delay(1000);
+  sensors_vec_t storage;
+  float xMag[SENSOR_NUM_SAMPLES];
+  float yMag[SENSOR_NUM_SAMPLES];
+  float zMag[SENSOR_NUM_SAMPLES];
+
+  //Grab multiple samples of data first
+  for(int i = 0; i < SENSOR_NUM_SAMPLES; i++){
+    xMag[i] = event.magnetic.x;
+    yMag[i] = event.magnetic.y;
+    zMag[i] = event.magnetic.z;
+  }
+  
+  //find mean of data, filter for consistent vals
+  storage.x = filteredMean(xMag);
+  storage.y = filteredMean(yMag);
+  storage.z = filteredMean(zMag);
+
+  return storage;
 }
-*/
+
+uint8_t magnetState(){
+  sensors_vec_t tmp = readIMUValue();
+ 
+  int xMagGood = tmp.x <= X_MAG_UPPER_THRESH && tmp.x >= X_MAG_LOWER_THRESH; //will need to test
+  int yMagGood = tmp.y <= Y_MAG_UPPER_THRESH && tmp.y >= Y_MAG_LOWER_THRESH;
+  int zMagGood = tmp.z <= Z_MAG_UPPER_THRESH && tmp.z >= Z_MAG_LOWER_THRESH;
+  
+  if((xMagGood + yMagGood + 2*zMagGood) >= 2){ //doing this so that if z fails, x and y must pass and vice-versa. may change logic here
+    return 1;
+  }else{
+    return 0;
+  }
+}

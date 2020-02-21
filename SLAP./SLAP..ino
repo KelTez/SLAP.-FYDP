@@ -10,7 +10,7 @@
  *******************************************************************************/
 #include "Globals.h"
 #include "IR.h"
-//#include "IMU.h" //including this just crashes everything
+#include "IMU.h" 
 #include "Functions.h"
 #include <Arduino.h>
 
@@ -61,9 +61,10 @@ void do_send(osjob_t* j){ //THIS IS WHERE I SHALL WRITE CODE TO CHECK THE STATUS
     } else {
         // Prepare upstream data transmission at the next possible time.
         IRState = readIRValue(IR_SENSOR);
-        IMUState = readIMUValue(); //MAKE FUNCTION
-        parkingState[0] =lowByte(getParkState(IRState,IMUState,IR_SENSOR,0)); //MAKE FUNCTION
-        parkingState[1] = highByte(getParkState(IRState,IMUState,IR_SENSOR,0));
+        IMUState = magnetState(); 
+        uint8_t pState = getParkState(IRState,IMUState,IR_SENSOR,0);
+        parkingState[0] = lowByte(pState); 
+        parkingState[1] = highByte(pState);
         
         LMIC_setTxData2(1, parkingState, sizeof(parkingState)-1, 0);
         Serial.println(F("Packet queued"));
@@ -78,6 +79,7 @@ void setup() {
     Serial.begin(115200);
     delay(100);
     Serial.println(F("Starting"));
+    initIMU();
 
     // LMIC init
     os_init();

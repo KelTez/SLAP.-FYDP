@@ -3,10 +3,6 @@
 #include "IR.h"
 #include "IMU.h"
 
-uint8_t readIMUValue(){
-  return 1;
-}
-
 uint8_t getParkState(uint8_t distState, uint8_t magState, uint8_t pin, uint8_t currentCount){
 	if(currentCount > MAX_READS_BEFORE_EXIT)
 	  return 0;
@@ -17,7 +13,7 @@ uint8_t getParkState(uint8_t distState, uint8_t magState, uint8_t pin, uint8_t c
 	}
 	else{
     currentCount++;
-		getParkState(readIRValue(pin),readIMUValue(),pin,currentCount); //doing a second read and will continuously do until either both are 0 or 1.
+		getParkState(readIRValue(pin),magnetState(),pin,currentCount); //doing a second read and will continuously do until either both are 0 or 1.
 	}
 }
 
