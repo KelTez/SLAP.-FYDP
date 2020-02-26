@@ -14,6 +14,8 @@
 #define CHANNEL 63 //using channel 63
 #define DOT_ID 1 //ID of the dot, see TTN for each individual dot. DOT 2 and 3 not working???
 
+static int prevParkState;
+
 //#define TEST_ESP32 //Only use when i wanna test the ESP, else comment
 
 /***********************************************************

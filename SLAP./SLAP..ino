@@ -9,7 +9,6 @@
  * Note that ABP is used instead of OTAA, as our gateway does not support OTAA.
  *******************************************************************************/
 #include "Globals.h"
-#include "IR.h"
 #include "IMU.h" 
 #include "Functions.h"
 #include <Arduino.h>
@@ -23,9 +22,6 @@ void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
 
 static uint8_t parkingState[2];
-static uint8_t IRState;
-static uint8_t IMUState;
-
 static osjob_t sendjob;
 
 // cycle limitations.
@@ -59,10 +55,9 @@ void do_send(osjob_t* j){ //THIS IS WHERE I SHALL WRITE CODE TO CHECK THE STATUS
     if (LMIC.opmode & OP_TXRXPEND) {
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
-        // Prepare upstream data transmission at the next possible time.
-        IRState = readIRValue(IR_SENSOR);
-        IMUState = magnetState(); 
-        uint8_t pState = getParkState(IRState,IMUState,IR_SENSOR,0);
+        // Prepare upstream data transmission at the next possible time.   
+        Serial.println("Starting Read");    
+        uint8_t pState = magnetState();
         parkingState[0] = lowByte(pState); 
         parkingState[1] = highByte(pState);
         

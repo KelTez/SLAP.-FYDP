@@ -7,9 +7,9 @@
 #include <LoRa.h>
 
 //define the pins used by the transceiver module
-#define ss 18
-#define rst 14
-#define dio0 26
+#define ss 8
+#define rst 4
+#define dio0 3
 
 void setup() {
   //initialize Serial Monitor
