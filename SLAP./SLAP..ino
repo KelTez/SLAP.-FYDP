@@ -81,12 +81,12 @@ void setup() {
     // Reset the MAC state. Session and pending data transfers will be discarded.
     LMIC_reset();
 
-    if(DOT_ID == 1){
-        DEVADDR = 0x26021879;
-    }else if(DOT_ID == 2){
-        DEVADDR = 0x26021679;
-    }else if(DOT_ID == 3){
-        DEVADDR = 0x26021F80;
+    if(DOT_ID == 53){
+        DEVADDR = 0x260213F1;
+    }else if(DOT_ID == 54){
+        DEVADDR = 0x2602121E;
+    }else if(DOT_ID == 55){
+        DEVADDR = 0x260214A7;
     }
 
     // Set static session parameters. Instead of dynamically establishing a session
