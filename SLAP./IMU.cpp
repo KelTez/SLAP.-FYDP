@@ -22,7 +22,6 @@ void initIMU(){
 void IMUCalibrate(){
   
 /* Display the floating point data */
-
   for(int i = 0; i < NUM_CALIB_READS; i++){
     mag_vector = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     zBadRange[i] = mag_vector.z();
@@ -52,11 +51,10 @@ void IMUCalibrate(){
   Serial.println(zBadRightBound,4);
   Serial.println(zBadLeftBound,4);
 
-} //TO  CHANGE!!!!!!
+}
 
 sensors_vec_t readIMUValue(){
   /* Get a new sensor event */ 
-   Serial.println("Entered readIMUValue");
   sensors_vec_t storage;
   float xMag[SENSOR_NUM_SAMPLES],yMag[SENSOR_NUM_SAMPLES],zMag[SENSOR_NUM_SAMPLES];
 
@@ -65,7 +63,6 @@ sensors_vec_t readIMUValue(){
     mag_vector = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     zMag[i] = mag_vector.z();
     delay(10);
-
   }
   
   storage.z = filteredMean(zMag);
@@ -74,7 +71,6 @@ sensors_vec_t readIMUValue(){
 }
 
 uint8_t magnetState(){
-  Serial.println("Entered Read");
   sensors_vec_t tmp = readIMUValue();
  
   int zMagGood = tmp.z < zBadLeftBound || zBadRightBound < tmp.z; 

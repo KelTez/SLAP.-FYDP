@@ -19,7 +19,7 @@ static Adafruit_BNO055 bno = Adafruit_BNO055();
 static imu::Vector<3> mag_vector;
 void initIMU();
 void IMUCalibrate();
-uint8_t magnetState(); //get magnet state from reading IMU value
+uint8_t magnetState(); 
 sensors_vec_t readIMUValue();
 
 #endif //IMU_H

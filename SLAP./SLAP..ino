@@ -7,6 +7,7 @@
  * arduino-lmic/project_config/lmic_project_config.h or from your BOARDS.txt.
 
  * Note that ABP is used instead of OTAA, as our gateway does not support OTAA.
+ * As an estimate, can stay active for about 4 hrs/day
  *******************************************************************************/
 #include "Globals.h"
 #include "IMU.h" 
@@ -39,6 +40,8 @@ void onEvent (ev_t ev) {
               Serial.println(LMIC.dataLen);
               Serial.println(F(" bytes of payload"));
             }
+
+            //can set interrupt here, set to a deep sleep for TX_INTERVAL, then the TX_INTERVAL below is shorter.
             // Schedule next transmission
             os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
             break;
@@ -70,7 +73,6 @@ void do_send(osjob_t* j){ //THIS IS WHERE I SHALL WRITE CODE TO CHECK THE STATUS
 
 void setup() {
     delay(5000);
-    while (!Serial);
     Serial.begin(115200);
     delay(100);
     Serial.println(F("Starting"));
@@ -105,16 +107,14 @@ void setup() {
       LMIC_disableChannel(c);
     }
 
-    // We'll only enable Channel 63 (914900000hz) since we're transmitting on a single-channel. This shall be the frequency we use
     LMIC_enableChannel(CHANNEL);
 
     // Disable link check validation
     LMIC_setLinkCheckMode(0);
 
     // TTN uses SF9 for its RX2 window.
-    LMIC.dn2Dr = SPREAD_FACTOR;
+    LMIC.dn2Dr = DR_SF9; 
 
-    // Set data rate and transmit power for uplink. Default to this value always. MUST BE SR_9
     LMIC_setDrTxpow(SPREAD_FACTOR,14);
 
     // Start job

@@ -8,15 +8,13 @@
 
 /*CONSTANTS FOR MAIN USE*/
 #define IR_SENSOR A1
-#define TX_INTERVAL 20
-#define LED_PIN //probably wont use
-#define SPREAD_FACTOR DR_SF9
-#define CHANNEL 63 //using channel 63
-#define DOT_ID 53 //54,55
+#define TX_INTERVAL 40 //should be a bit larger to hit TTN regulations
+#define SPREAD_FACTOR DR_SF7
+#define CHANNEL 10 
+#define DOT_ID 53 //53,54,55
 
 static int prevParkState;
 
-//#define TEST_ESP32 //Only use when i wanna test the ESP, else comment
 
 /***********************************************************
  * Defining the board constants, set to 0 when not in use. *
@@ -30,8 +28,7 @@ const lmic_pinmap lmic_pins = {
     .dio = {3, 6, LMIC_UNUSED_PIN},
     .rxtx_rx_active = 0,
     .rssi_cal = 8,              // LBT cal for the Adafruit Feather M0 LoRa, in dB
-    .spi_freq = 8000000,
-    
+    .spi_freq = 8000000, 
 };
 
 /*******************

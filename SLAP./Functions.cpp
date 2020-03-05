@@ -2,7 +2,6 @@
 #include <Arduino.h>
 #include "IMU.h"
 
-
 float calculateAdjustedMean(float data[], float mean, float stdDev) {
   float sum,count = 0.0;
   for (int i = 0; i < SENSOR_NUM_SAMPLES; ++i) {
