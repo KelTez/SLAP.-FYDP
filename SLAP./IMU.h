@@ -21,5 +21,6 @@ void initIMU();
 void IMUCalibrate();
 uint8_t magnetState(); 
 sensors_vec_t readIMUValue();
+static float savedMagValue;
 
 #endif //IMU_H

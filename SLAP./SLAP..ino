@@ -21,8 +21,9 @@
 void os_getArtEui (u1_t* buf) { }
 void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
-
-static uint8_t parkingState[2];
+uint16_t payloadRightBound;
+uint16_t payloadLeftBound;
+static uint8_t parkingState[8]; //sending calibration values (2), magnet state (1), parkState (1) - 8
 static osjob_t sendjob;
 
 // cycle limitations.
@@ -60,13 +61,29 @@ void do_send(osjob_t* j){ //THIS IS WHERE I SHALL WRITE CODE TO CHECK THE STATUS
     } else {
         // Prepare upstream data transmission at the next possible time.   
         Serial.println("Starting Read");    
-        uint8_t pState = magnetState();
+        uint8_t pState = magnetState(); //might convert all values to floats?? even park state, will need to change decoder.js
+
+        // float -> int
+        uint16_t payloadMagVal = LMIC_f2sflt16(savedMagValue);
+
         parkingState[0] = lowByte(pState); 
         parkingState[1] = highByte(pState);
+        parkingState[2] = lowByte(payloadRightBound);  
+        parkingState[3] = highByte(payloadRightBound);
+        parkingState[4] = lowByte(payloadLeftBound);
+        parkingState[5] = highByte(payloadLeftBound);
+        parkingState[6] = lowByte(payloadMagVal);
+        parkingState[7] = highByte(payloadMagVal);
         
         LMIC_setTxData2(1, parkingState, sizeof(parkingState)-1, 0);
         Serial.println(F("Packet queued"));
         Serial.println(parkingState[0]);
+
+        msgsSent++;
+
+        if(msgsSent == 200)
+            TX_INTERVAL = 50;  
+
     }
     // Next TX is scheduled after TX_COMPLETE event.
 }
@@ -78,6 +95,9 @@ void setup() {
     Serial.println(F("Starting"));
     initIMU();
 
+    //float -> int
+    payloadRightBound = LMIC_f2sflt16(zBadRightBound);
+    payloadLeftBound = LMIC_f2sflt16(zBadLeftBound);
     // LMIC init
     os_init();
     // Reset the MAC state. Session and pending data transfers will be discarded.

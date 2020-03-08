@@ -8,13 +8,13 @@
 
 /*CONSTANTS FOR MAIN USE*/
 #define IR_SENSOR A1
-#define TX_INTERVAL 40 //should be a bit larger to hit TTN regulations
 #define SPREAD_FACTOR DR_SF7
 #define CHANNEL 10 
 #define DOT_ID 53 //53,54,55
 
 static int prevParkState;
-
+static int TX_INTERVAL = 20;
+static int msgsSent = 0; //when its 200, change tx to 50
 
 /***********************************************************
  * Defining the board constants, set to 0 when not in use. *

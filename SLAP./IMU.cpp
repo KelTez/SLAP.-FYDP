@@ -16,12 +16,10 @@ void initIMU(){
     
   bno.setExtCrystalUse(true);
   IMUCalibrate();
-  
 }
 
 void IMUCalibrate(){
-  
-/* Display the floating point data */
+  /* Display the floating point data */
   for(int i = 0; i < NUM_CALIB_READS; i++){
     mag_vector = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     zBadRange[i] = mag_vector.z();
@@ -50,7 +48,6 @@ void IMUCalibrate(){
   Serial.println("Done Calibration");
   Serial.println(zBadRightBound,4);
   Serial.println(zBadLeftBound,4);
-
 }
 
 sensors_vec_t readIMUValue(){
@@ -74,6 +71,7 @@ uint8_t magnetState(){
   sensors_vec_t tmp = readIMUValue();
  
   int zMagGood = tmp.z < zBadLeftBound || zBadRightBound < tmp.z; 
+  savedMagValue = tmp.z;
   Serial.print("VAL:  ");
   Serial.println(tmp.z);
   if(zMagGood){ 
@@ -81,5 +79,4 @@ uint8_t magnetState(){
   }else{
     return 0;
   }
-
 }
